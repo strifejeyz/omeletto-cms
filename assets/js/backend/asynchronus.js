@@ -17,10 +17,8 @@ let sync = function ()
         order:     $('#page_order').val(),
         query:     $('#page_query').val(),
         fetchURL:  $('#page_fetch_route').val(),
-        container: $('#data_container'),
-        table:     $('#table')
+        container: $('#data_container')
     }
-
     localStorage.setItem('page_order', parameters.order);
     localStorage.setItem('page_limit', parameters.limit);
     localStorage.setItem('page_sort_by', parameters.sort_by);
@@ -35,7 +33,7 @@ let sync = function ()
         },
         success: function (data) {
             parameters.container.html(data);
-            parameters.table.DataTable({
+            $('#table').DataTable({
                 stateSave: true
             });
         },
@@ -72,16 +70,30 @@ let toggle = function (resource_route)
  * to make sure sorting orders and such
  * are reflected to the container.
  * */
-
 window.onload = function () {
-    if (localStorage.getItem('page_order') != null) {
+
+    if (localStorage.getItem('page_order') !== 'null') {
         $('#page_order').val(localStorage.getItem('page_order'))
     }
-    if (localStorage.getItem('page_limit') != null) {
+    if (localStorage.getItem('page_limit') !== 'null') {
         $('#page_limit').val(localStorage.getItem('page_limit'))
     }
-    if (localStorage.getItem('page_sort_by') != null) {
-        $('#page_sort_by').val(localStorage.getItem('page_sort_by'))
+    if (localStorage.getItem('page_sort_by') !== 'null') {
+        $('#page_sort_by').val(localStorage.getItem('page_sort_by'));
+
+        let select = document.getElementById('page_sort_by');
+        let counts = 0;
+        for (let i = 0; i < select.children.length; i++) {
+            if (select.children[i].value == localStorage.getItem('page_sort_by')) {
+                counts++;
+                break;
+            }
+        }
+        if (counts > 0) {
+            $('#page_sort_by').val(localStorage.getItem('page_sort_by'));
+        } else {
+            $('#page_sort_by').val('id');
+        }
     }
     sync();
 }

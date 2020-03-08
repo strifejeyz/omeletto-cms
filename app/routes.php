@@ -26,7 +26,7 @@ assign('cms.media.download -> /=/media-library/download/:int', '/cms/MediaContro
 
 
 assign('cms.users.index  -> /=/users', '/cms/UsersController@index');
-assign('cms.users.fetch  -> /=/users/fetch/:any/:str/:any', '/cms/UsersController@fetch');
+assign('cms.users.fetch  -> /=/users/fetch', '/cms/UsersController@fetch');
 
 assign('cms.users.create -> /=/users/create', '/cms/UsersController@create');
 post  ('cms.users.store  -> /=/users/store', '/cms/UsersController@store');

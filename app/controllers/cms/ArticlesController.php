@@ -33,7 +33,7 @@ class ArticlesController extends Auth
                 ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
                 ->get();
         } else {
-            $check = Article::where($res->get('sort_by'), $res->get('query'))->get();
+            $check = Article::where('id', $res->get('query'))->get();
             if (is_numeric($res->get('query')) && !empty($check)) {
                 $articles = ($check);
             } else {

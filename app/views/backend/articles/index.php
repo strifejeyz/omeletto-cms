@@ -10,7 +10,7 @@
 
         <div class="float-right table-form">
             <select id="page_limit" onchange="sync()">
-                <option>10</option>
+                <option selected>10</option>
                 <option>20</option>
                 <option>30</option>
                 <option>40</option>
@@ -24,9 +24,8 @@
                 <option>Custom</option>
             </select>
 
-        <div class="float-right table-form">
             <select id="page_sort_by" onchange="sync()">
-                <option value="id">ID</option>
+                <option value="id" selected>ID</option>
                 <option value="title">Title</option>
                 <option value="content">Content</option>
                 <option value="published">Published</option>
@@ -34,11 +33,11 @@
             </select>
 
             <select id="page_order" onchange="sync()">
-                <option value="DESC">Descending</option>
+                <option value="DESC" selected>Descending</option>
                 <option value="ASC">Ascending</option>
             </select>
 
-            <input type="search" onkeypress="sync()" placeholder="Search..." id="page_query">
+            <input type="search" onkeyup="sync()" placeholder="Search..." id="page_query">
 
             <button onclick="sync()">
                 <i class="fa fa-search"></i>

@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Kernel\Database\Database;
+use Kernel\Requests\HTTPRequest;
 use App\Requests\EditUserRequest;
 use App\Requests\CreateUserRequest;
 
@@ -20,47 +21,30 @@ class UsersController extends Auth
     /**
      * Controller Index
      *
-     * @param $limit
-     * @param $order
-     * @param $search
      * @return mixed
      **/
-    public function fetch($limit, $order, $search)
+    public function fetch()
     {
-        if ($search == '__EMPTY__') {
-            if ($limit == 'All') {
-                $users = User::order('id', $order)->get();
-            } else {
-                $users = User::order('id', $order)->limit($limit)->get();
-            }
+        $res = new HTTPRequest;
+
+        if (empty($res->get('query'))) {
+            $users = User::order($res->get('sort_by'), $res->get('order'))
+                ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
+                ->get();
         } else {
-            $query = new Database;
-
-            if (is_numeric($search) && User::where('id', $search)->get()) {
-                $users = User::where('id', $search)->get();
+            $check = User::where('id', $res->get('query'))->get();
+            if (is_numeric($res->get('query')) && !empty($check)) {
+                $users = ($check);
             } else {
-                $limit = $limit=='All'?'':"LIMIT $limit";
-
-                $users = $query->query("
-                SELECT * 
-                FROM users 
-                WHERE id=? 
-                OR firstname LIKE ? 
-                OR lastname LIKE ? 
-                OR email LIKE ? 
-                OR phone_number LIKE ? 
-                OR role LIKE ? 
-                OR active LIKE ? 
-                ORDER BY id {$order} 
-                {$limit}",
-                    [$search,
-                        "%$search%",
-                        "%$search%",
-                        "%$search%",
-                        "%$search%",
-                        "%$search%",
-                        "%$search%",
-                    ]);
+                $users = User::where('firstname', 'like', "%{$res->get('query')}%")
+                    ->orWhere('lastname', 'like', "%{$res->get('query')}%")
+                    ->orWhere('email', 'like', "%{$res->get('query')}%")
+                    ->orWhere('phone_number', 'like', "%{$res->get('query')}%")
+                    ->orWhere('role', 'like', "%{$res->get('query')}%")
+                    ->orWhere('active', 'like', "%{$res->get('query')}%")
+                    ->order($res->get('sort_by'), $res->get('order'))
+                    ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
+                    ->get();
             }
         }
 
@@ -69,7 +53,8 @@ class UsersController extends Auth
             <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 <th>Email</th>
                 <th>Number</th>
                 <th>Role</th>
@@ -94,13 +79,15 @@ EOF;
             echo <<<EOF
             <tr>
                 <td>{$user->id}</td>
-                <td>{$user->firstname} {$user->lastname} {$edit}</td>
+                <td>{$user->firstname}</td>
+                <td>{$user->lastname}</td>
                 <td>{$user->email}</td>
                 <td>{$user->phone_number}</td>
                 <td>{$user->role}</td>
                 <td>{$user->active}</td>
                 <td>
-                    <a href="#" onclick="toggle('{$toggle_link}')" class="btn btn-xs btn-primary">{$user_active}</a>
+                    <a href="#" onclick="toggle('{$toggle_link}')" class="btn btn-xs btn-primary">{$user_active}</a> 
+                    {$edit} 
                 </td>
             </tr>
 
