@@ -1,0 +1,39 @@
+body {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 14px;
+}
+
+.has-error .form-control {
+    border: 1px solid #ff0039;
+}
+
+.table-form input,
+.table-form select {
+    border: 1px solid #ccc;
+    padding: 5px;
+    position:relative;
+    left: 5px;
+    border-radius: 3px;
+}
+.table-form button {
+    border: 1px solid #fff;
+    padding: 6px;
+    width: 37px;
+    position:relative;
+    background: #25a900;
+    color: #efefef
+}
+
+.omeletto-box {
+    background: white;
+    padding: 10px;
+    box-shadow: 0 3px 5px #e4e4e4;
+    border-radius: 5px;
+    border: 1px solid #efefef;
+}
+
+.omeletto-box-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f7f7f7;
+    margin-bottom: 12px;
+}
