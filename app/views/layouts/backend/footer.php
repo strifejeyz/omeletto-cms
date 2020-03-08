@@ -29,18 +29,5 @@
 <script src="/assets/js/adminlte.min.js"></script>
 <script src="/assets/js/backend/asynchronus.js"></script>
 <script src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"></script>
-<script>
-    window.onload = function () {
-        if (localStorage.getItem('resource_order') != null) {
-            $('#resource_order').val(localStorage.getItem('resource_order'))
-        }
-
-        if (localStorage.getItem('resource_limit') != null) {
-            $('#resource_limit').val(localStorage.getItem('resource_limit'))
-        }
-
-        sync();
-    }
-</script>
 </body>
 </html>

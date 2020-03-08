@@ -1,7 +1,7 @@
 @extend('/layouts/backend', ['title'=>'Articles','subtitle'=>'View all articles'])
 
 <div class="omeletto-box">
-    <input type="hidden" id="base_route_url" value="/=/articles/fetch/">
+    <input type="hidden" id="page_fetch_route" value="/=/articles/fetch">
     <div class="omeletto-box-header">
         <div class="float-left">
             <a href="{{r('cms.articles.create')}}" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Make an article</a>
@@ -9,7 +9,7 @@
         </div>
 
         <div class="float-right table-form">
-            <select id="resource_limit" onchange="sync()">
+            <select id="page_limit" onchange="sync()">
                 <option>10</option>
                 <option>20</option>
                 <option>30</option>
@@ -24,12 +24,21 @@
                 <option>Custom</option>
             </select>
 
-            <select id="resource_order" onchange="sync()">
+        <div class="float-right table-form">
+            <select id="page_sort_by" onchange="sync()">
+                <option value="id">ID</option>
+                <option value="title">Title</option>
+                <option value="content">Content</option>
+                <option value="published">Published</option>
+                <option value="date_published">Date published</option>
+            </select>
+
+            <select id="page_order" onchange="sync()">
                 <option value="DESC">Descending</option>
                 <option value="ASC">Ascending</option>
             </select>
 
-            <input type="search" onkeypress="sync()" placeholder="Search..." id="resource_query">
+            <input type="search" onkeypress="sync()" placeholder="Search..." id="page_query">
 
             <button onclick="sync()">
                 <i class="fa fa-search"></i>

@@ -11,31 +11,36 @@
 
 let sync = function ()
 {
-    let resource_order = $('#resource_order').val();
-    let resource_limit = $('#resource_limit').val();
-    let resource_query = $('#resource_query').val();
-    let base_route_url = $('#base_route_url').val();
-    let data_container = $('#data_container');
+    let parameters = {
+        limit:     $('#page_limit').val(),
+        sort_by:   $('#page_sort_by').val(),
+        order:     $('#page_order').val(),
+        query:     $('#page_query').val(),
+        fetchURL:  $('#page_fetch_route').val(),
+        container: $('#data_container'),
+        table:     $('#table')
+    }
 
-    if (resource_query == '')
-        resource_query = '__EMPTY__';
+    localStorage.setItem('page_order', parameters.order);
+    localStorage.setItem('page_limit', parameters.limit);
+    localStorage.setItem('page_sort_by', parameters.sort_by);
 
-    if (resource_order == null)
-        resource_order = 'DESC';
-    if (resource_limit == null)
-        resource_limit = 10;
-
-    let resource_route = base_route_url + resource_limit + '/' + resource_order + '/' + resource_query;
-
-    localStorage.setItem('resource_order', resource_order);
-    localStorage.setItem('resource_limit', resource_limit);
-
-    $.ajax(resource_route, {
-        success: function (data, status, xhr) {
-            data_container.html(data);
-            $('#table').DataTable({
+    $.ajax(parameters.fetchURL, {
+        type: 'POST',
+        data: {
+            limit: parameters.limit,
+            sort_by: parameters.sort_by,
+            order: parameters.order,
+            query: parameters.query
+        },
+        success: function (data) {
+            parameters.container.html(data);
+            parameters.table.DataTable({
                 stateSave: true
             });
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
         }
     });
 }
@@ -59,4 +64,24 @@ let toggle = function (resource_route)
             }
         }
     });
+}
+
+
+/*
+ * Set things up upon first load
+ * to make sure sorting orders and such
+ * are reflected to the container.
+ * */
+
+window.onload = function () {
+    if (localStorage.getItem('page_order') != null) {
+        $('#page_order').val(localStorage.getItem('page_order'))
+    }
+    if (localStorage.getItem('page_limit') != null) {
+        $('#page_limit').val(localStorage.getItem('page_limit'))
+    }
+    if (localStorage.getItem('page_sort_by') != null) {
+        $('#page_sort_by').val(localStorage.getItem('page_sort_by'))
+    }
+    sync();
 }

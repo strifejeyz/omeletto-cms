@@ -3,7 +3,7 @@
 use Kernel\Format;
 use App\Models\User;
 use App\Models\Article;
-use Kernel\Database\Database;
+use Kernel\Requests\HTTPRequest;
 use App\Requests\CreateArticleRequest;
 
 class ArticlesController extends Auth
@@ -22,41 +22,28 @@ class ArticlesController extends Auth
     /**
      * Controller Index
      *
-     * @param $limit
-     * @param $order
-     * @param $search
      * @return mixed
      **/
-    public function fetch($limit, $order, $search)
+    public function fetch()
     {
-        if ($search == '__EMPTY__') {
-            if ($limit == 'All') {
-                $articles = Article::order('id', $order)->get();
-            } else {
-                $articles = Article::order('id', $order)->limit($limit)->get();
-            }
+        $res = new HTTPRequest;
+
+        if (empty($res->get('query'))) {
+            $articles = Article::order($res->get('sort_by'), $res->get('order'))
+                ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
+                ->get();
         } else {
-            $query = new Database;
-
-            if (is_numeric($search) && Article::where('id', $search)->get()) {
-                $articles = Article::where('id', $search)->get();
+            $check = Article::where($res->get('sort_by'), $res->get('query'))->get();
+            if (is_numeric($res->get('query')) && !empty($check)) {
+                $articles = ($check);
             } else {
-                $limit = $limit=='All'?'':"LIMIT $limit";
-
-                $articles = $query->query("
-                SELECT * 
-                FROM articles 
-                WHERE title LIKE ? 
-                OR published LIKE ? 
-                OR content LIKE ? 
-                OR date_published LIKE ?
-                ORDER BY id {$order} 
-                {$limit}",
-                    [$search,
-                        "%$search%",
-                        "%$search%",
-                        "%$search%",
-                    ]);
+                $articles = Article::where('title', 'like', "%{$res->get('query')}%")
+                    ->orWhere('published', 'like', "%{$res->get('query')}%")
+                    ->orWhere('content', 'like', "%{$res->get('query')}%")
+                    ->orWhere('date_published', 'like', "%{$res->get('query')}%")
+                    ->order($res->get('sort_by'), $res->get('order'))
+                    ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
+                    ->get();
             }
         }
 
@@ -78,22 +65,22 @@ EOF;
 
         foreach ($articles as $article):
             $author = User::find($article->user_id);
-            $published = $article->published=='no'?'Publish':'Unpublish';
+            $published = $article->published == 'no' ? 'Publish' : 'Unpublish';
             $route = r('cms.articles.publish', $article->slug);
-            $badge = $article->published=='no'?'warning':'primary';
+            $badge = $article->published == 'no' ? 'warning' : 'primary';
 
             echo "
             <tr>
                 <td>{$article->id}</td>
                 <td>{$author->firstname} {$author->lastname}</td>
-                <td>".Format::fold($article->title, 50)."</td>
+                <td>" . Format::fold($article->title, 50) . "</td>
                 <td>{$article->date_published}</td>
-                <td>".date('F j, Y',$article->created)."</td>
+                <td>" . date('F j, Y', $article->created) . "</td>
                 <td>
                     <span class='badge badge-{$badge}'>$article->published</span>
                 </td>
                 <td>
-                    <a href='" . r('cms.articles.edit', $article->slug) .  "'>Edit</a> |
+                    <a href='" . r('cms.articles.edit', $article->slug) . "'>Edit</a> |
                     <a href='#' onclick=\"toggle('{$route}')\">{$published}</a>
                 </td>
             </tr>";

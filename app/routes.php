@@ -10,7 +10,7 @@
 assign('welcome -> /=/welcome', '/cms/WelcomeController@index');
 
 assign('cms.articles.index   -> /=/articles', '/cms/ArticlesController@index');
-assign('cms.articles.fetch   -> /=/articles/fetch/:any/:str/:any', '/cms/ArticlesController@fetch');
+post  ('cms.articles.fetch   -> /=/articles/fetch', '/cms/ArticlesController@fetch');
 assign('cms.articles.create  -> /=/articles/create', '/cms/ArticlesController@create');
 post  ('cms.articles.store   -> /=/articles/store', '/cms/ArticlesController@store');
 assign('cms.articles.edit    -> /=/articles/edit/:any', '/cms/ArticlesController@edit');
