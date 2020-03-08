@@ -1,7 +1,7 @@
 @extend('/layouts/backend', ['title'=>'Media Library','subtitle'=>'List of all Files'])
 
 <div class="omeletto-box">
-    <input type="hidden" id="base_route_url" value="/=/media-library/fetch/">
+    <input type="hidden" id="page_fetch_route" value="/=/media-library/fetch">
     <div class="omeletto-box-header">
         <div class="float-left">
             <a href="{{r('cms.media.upload')}}" class="btn btn-primary btn-sm float-left"><i class="fa fa-upload"></i> Upload a file</a> &nbsp;&nbsp;
@@ -9,7 +9,7 @@
         </div>
 
         <div class="float-right table-form">
-            <select id="resource_limit" onchange="sync()">
+            <select id="page_limit" onchange="sync()">
                 <option>10</option>
                 <option>20</option>
                 <option>30</option>
@@ -24,12 +24,19 @@
                 <option>Custom</option>
             </select>
 
-            <select id="resource_order" onchange="sync()">
+            <select id="page_sort_by" onchange="sync()">
+                <option value="id">ID</option>
+                <option value="name">File Name</option>
+                <option value="extension">Extension</option>
+                <option value="type">Type</option>
+            </select>
+
+            <select id="page_order" onchange="sync()">
                 <option value="DESC">Descending</option>
                 <option value="ASC">Ascending</option>
             </select>
 
-            <input type="search" onkeypress="sync()" placeholder="Search..." id="resource_query">
+            <input type="search" onkeypress="sync()" placeholder="Search..." id="page_query">
 
             <button onclick="sync()">
                 <i class="fa fa-search"></i>
@@ -41,6 +48,5 @@
     <div id="data_container"></div>
 </div>
 
-@stop()
 
 @stop()

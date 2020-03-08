@@ -2,8 +2,7 @@
 
 use App\Models\User;
 use App\Models\Media;
-use Kernel\Database\Database;
-use Kernel\Requests\FileRequest;
+use Kernel\Requests\HTTPRequest;
 
 class MediaController extends Auth
 {
@@ -26,20 +25,27 @@ class MediaController extends Auth
      *
      * @return mixed
      **/
-    public function fetch($limit, $order, $search)
+    public function fetch()
     {
-        if ($search == '__EMPTY__'):
-            $files = Media::order('id', $order)
-                ->limit(!is_numeric($limit) ? false : $limit)
+        $res = new HTTPRequest;
+
+        if (empty($res->get('query'))) {
+            $media = Media::order($res->get('sort_by'), $res->get('order'))
+                ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
                 ->get();
-        else:
-            $files = Media::where('name', 'like', "%$search%")
-                ->orWhere('extension', 'like', "%$search%")
-                ->orWhere('type', 'like', "%$search%")
-                ->order('id', $order)
-                ->limit(!is_numeric($limit) ? false : $limit)
-                ->get();
-        endif;
+        } else {
+            $check = Media::where('id', $res->get('query'))->get();
+            if (is_numeric($res->get('query')) && !empty($check)) {
+                $media = ($check);
+            } else {
+                $media = Media::where('name', 'like', "%{$res->get('query')}%")
+                    ->orWhere('extension', 'like', "%{$res->get('query')}%")
+                    ->orWhere('type', 'like', "%{$res->get('query')}%")
+                    ->order($res->get('sort_by'), $res->get('order'))
+                    ->limit(!is_numeric($res->get('limit')) ? false : $res->get('limit'))
+                    ->get();
+            }
+        }
 
         echo <<<EOF
         <table id="table" class="table table-sm display">
@@ -57,7 +63,7 @@ class MediaController extends Auth
             <tbody>
 EOF;
 
-        foreach ($files as $file):
+        foreach ($media as $file):
             $author = User::find($file->user_id);
             $download = r('cms.media.download', $file->id);
             $hardlink = BASE_URL . "assets/media/$file->name";

@@ -19,7 +19,7 @@ post  ('cms.articles.update  -> /=/articles/update', '/cms/ArticlesController@up
 
 
 assign('cms.media.index    -> /=/media-library', '/cms/MediaController@index');
-assign('cms.media.fetch    -> /=/media-library/fetch/:any/:str/:any', '/cms/MediaController@fetch');
+assign('cms.media.fetch    -> /=/media-library/fetch', '/cms/MediaController@fetch');
 assign('cms.media.upload   -> /=/media-library/upload', '/cms/MediaController@upload');
 post  ('cms.media.store    -> /=/media-library/store', '/cms/MediaController@store');
 assign('cms.media.download -> /=/media-library/download/:int', '/cms/MediaController@download');
