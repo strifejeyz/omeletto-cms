@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Media;
+use Kernel\Database\Database;
 use Kernel\Requests\FileRequest;
 
 class MediaController extends Auth
@@ -27,28 +28,18 @@ class MediaController extends Auth
      **/
     public function fetch($limit, $order, $search)
     {
-        if ($search == '__EMPTY__') {
-            if ($limit == 'All') {
-                $files = Media::order('id', $order)->get();
-            } else {
-                $files = Media::order('id', $order)->limit($limit)->get();
-            }
-        } else {
-            $query = new Database;
-            $limit = $limit == 'All' ? '' : "LIMIT $limit";
-            $articles = $query->query("
-                SELECT * 
-                FROM media 
-                WHERE name LIKE ? 
-                OR extension LIKE ? 
-                OR type LIKE ? 
-                ORDER BY id {$order} 
-                {$limit}",
-                [$search,
-                    "%$search%",
-                    "%$search%",
-                ]);
-        }
+        if ($search == '__EMPTY__'):
+            $files = Media::order('id', $order)
+                ->limit(!is_numeric($limit) ? false : $limit)
+                ->get();
+        else:
+            $files = Media::where('name', 'like', "%$search%")
+                ->orWhere('extension', 'like', "%$search%")
+                ->orWhere('type', 'like', "%$search%")
+                ->order('id', $order)
+                ->limit(!is_numeric($limit) ? false : $limit)
+                ->get();
+        endif;
 
         echo <<<EOF
         <table id="table" class="table table-sm display">
@@ -68,7 +59,7 @@ EOF;
 
         foreach ($files as $file):
             $author = User::find($file->user_id);
-            $download = r('cms.media.download',$file->id);
+            $download = r('cms.media.download', $file->id);
             $hardlink = BASE_URL . "assets/media/$file->name";
 
             echo "
@@ -76,8 +67,8 @@ EOF;
                 <td>{$file->id}</td>
                 <td>{$file->name}</td>
                 <td>{$file->extension}</td>
-                <td>".to_megabytes($file->size)."Mb</td>
-                <td>".date('F j, Y', $file->created)."</td>
+                <td>" . to_megabytes($file->size) . "Mb</td>
+                <td>" . date('F j, Y', $file->created) . "</td>
                 <td>{$author->firstname} {$author->lastname}</td>
                 <td>
                     <button class='btn btn-xs btn-warning' onclick=\"prompt('Hard link: ', '$hardlink')\">Hard link</button> |
